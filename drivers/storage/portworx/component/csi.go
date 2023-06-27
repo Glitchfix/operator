@@ -590,11 +590,14 @@ func getCSIDeploymentSpec(
 	}
 	imagePullPolicy := pxutil.ImagePullPolicy(cluster)
 
+	timeout := pxutil.GetCSIRequestTimeout()
+
 	var args []string
 	if util.GetImageMajorVersion(provisionerImage) >= 2 {
 		args = []string{
 			"--v=3",
 			"--csi-address=$(ADDRESS)",
+			fmt.Sprintf("--timeout=%ds", timeout),
 			"--leader-election=true",
 			"--default-fstype=ext4",
 			"--extra-create-metadata=true",
@@ -603,6 +606,7 @@ func getCSIDeploymentSpec(
 		args = []string{
 			"--v=3",
 			"--provisioner=" + csiConfig.DriverName,
+			fmt.Sprintf("--timeout=%ds", timeout),
 			"--csi-address=$(ADDRESS)",
 			"--enable-leader-election",
 			"--leader-election-type=" + provisionerLeaderElectionType,

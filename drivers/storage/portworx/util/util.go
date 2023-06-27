@@ -73,6 +73,11 @@ const (
 	// EnvKeyKubeletDir env var to set custom kubelet directory
 	EnvKeyKubeletDir = "KUBELET_DIR"
 
+	// CSI request timeout in seconds (defaults to 10 seconds)
+	CSIRequestTimeout = "csi-node-driver-registrar"
+	// CSI default request timeout in seconds
+	CSIDefaultRequestTimeout = 10
+
 	// AnnotationIsPKS annotation indicating whether it is a PKS cluster
 	AnnotationIsPKS = pxAnnotationPrefix + "/is-pks"
 	// AnnotationIsGKE annotation indicating whether it is a GKE cluster
@@ -1104,4 +1109,18 @@ func IsFreshInstall(cluster *corev1.StorageCluster) bool {
 		cluster.Status.Phase == string(corev1.ClusterStateInit) ||
 		(cluster.Status.Phase == string(corev1.ClusterStateDegraded) &&
 			util.GetStorageClusterCondition(cluster, PortworxComponentName, corev1.ClusterConditionTypeRuntimeState) == nil)
+}
+
+// GetCSIRequestTimeout get timeout for csi provisioner in seconds
+func GetCSIRequestTimeout() uint64 {
+	timeoutStr := os.Getenv(CSIRequestTimeout)
+	if timeoutStr == "" {
+		return CSIDefaultRequestTimeout
+	}
+	timeout, err := strconv.ParseUint(timeoutStr, 10, 64)
+	if nil != err {
+		logrus.Errorf("failed to parse CSIRequestTimeout: %v", err)
+		return CSIDefaultRequestTimeout
+	}
+	return timeout
 }
