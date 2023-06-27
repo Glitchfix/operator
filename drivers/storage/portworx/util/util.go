@@ -73,8 +73,6 @@ const (
 	// EnvKeyKubeletDir env var to set custom kubelet directory
 	EnvKeyKubeletDir = "KUBELET_DIR"
 
-	// CSI request timeout in seconds (defaults to 10 seconds)
-	CSIRequestTimeout = "csi-node-driver-registrar"
 	// CSI default request timeout in seconds
 	CSIDefaultRequestTimeout = 10
 
@@ -194,6 +192,8 @@ const (
 	EnvKeyPortworxHTTPProxy = "PX_HTTP_PROXY"
 	// EnvKeyPortworxHTTPSProxy env var to use https proxy
 	EnvKeyPortworxHTTPSProxy = "PX_HTTPS_PROXY"
+	// CSI request timeout in seconds (defaults to 10 seconds)
+	EnvCSIRequestTimeout = "CSI_NODE_DRIVER_TIMEOUT"
 
 	// SecurityPXSystemSecretsSecretName is the secret name for PX security system secrets
 	SecurityPXSystemSecretsSecretName = "px-system-secrets"
@@ -1113,7 +1113,7 @@ func IsFreshInstall(cluster *corev1.StorageCluster) bool {
 
 // GetCSIRequestTimeout get timeout for csi provisioner in seconds
 func GetCSIRequestTimeout() uint64 {
-	timeoutStr := os.Getenv(CSIRequestTimeout)
+	timeoutStr := os.Getenv(EnvCSIRequestTimeout)
 	if timeoutStr == "" {
 		return CSIDefaultRequestTimeout
 	}
